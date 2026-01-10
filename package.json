@@ -1,0 +1,24 @@
+{
+  "name": "ebay",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/Muhammad-Afzaal1/WadPrjoect#readme",
+  "bugs": {
+    "url": "https://github.com/Muhammad-Afzaal1/WadPrjoect/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Muhammad-Afzaal1/WadPrjoect.git"
+  },
+  "license": "ISC",
+  "author": "Afzaal",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "mongoose": "^9.1.2"
+  }
+}
