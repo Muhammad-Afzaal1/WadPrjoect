@@ -2,19 +2,11 @@ const express = require("express");
 const router = express.Router();
 const Product = require("../models/Product");
 const authenticateToken = require("../middleware/authenticateToken");
+const isSeller = require('../middleware/isSeller');
 
-// PUBLIC
-router.get("/", async (req, res) => {
-  res.send("hello");
-});
-
-// TEST PROTECTED
-router.get("/w", authenticateToken, (req, res) => {
-  res.send("authenticated");
-});
 
 // CREATE PRODUCT (PROTECTED)
-router.post("/", authenticateToken, async (req, res) => {
+router.post("/", authenticateToken, isSeller, async (req, res) => {
   try {
     const { name, description, price, quantity, category, images } = req.body;
 
