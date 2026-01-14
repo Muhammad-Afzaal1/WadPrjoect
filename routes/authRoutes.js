@@ -32,7 +32,8 @@ router.post('/login', async(req, res)=>{
         if(!user){
             res.status(401).json({error:"User with this email doesn't exist"})
         }
-        if(!user.comparePassword(password)){
+        const isMatch = await user.comparePassword(password)
+        if(!isMatch){
             res.status(401).json({error:"Incorrect password"})
         }
         const payload= {
