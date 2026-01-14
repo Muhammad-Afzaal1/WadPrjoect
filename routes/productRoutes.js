@@ -3,7 +3,7 @@ const router = express.Router();
 const Product = require("../models/Product");
 const authenticateToken = require("../middleware/authenticateToken");
 const isSeller = require('../middleware/isSeller');
-
+const isProductOwner = require('../middleware/isProductOwner')
 
 // CREATE PRODUCT (PROTECTED)
 router.post("/", authenticateToken, isSeller, async (req, res) => {
@@ -27,6 +27,17 @@ router.post("/", authenticateToken, isSeller, async (req, res) => {
   }
 });
 
+// Updated Public GET route
+router.get("/", async (req, res) => {
+  try {
+    // Only show products where status is 'enabled'
+    const products = await Product.find({ status: "enabled" });
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // GET PRODUCT BY ID (PUBLIC)
 router.get("/:id", async (req, res) => {
   try {
@@ -45,7 +56,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // UPDATE PRODUCT (PROTECTED)
-router.put("/:id", authenticateToken, async (req, res) => {
+router.put("/:id", authenticateToken, isProductOwner, async (req, res) => {
   try {
     const product = await Product.findByIdAndUpdate(
       req.params.id,
@@ -60,7 +71,7 @@ router.put("/:id", authenticateToken, async (req, res) => {
 });
 
 // DELETE PRODUCT (PROTECTED)
-router.delete("/:id", authenticateToken, async (req, res) => {
+router.delete("/:id", authenticateToken,isSeller, isProductOwner, async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: "Product deleted successfully" });
@@ -68,5 +79,26 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+router.patch('/:id/status', authenticateToken,isSeller, isProductOwner,async(req, res)=>{
+  try{
+    const {status} = req.body
+    if(!['enabled', 'disabled'].includes(status)){
+      return res.status(400).json({ 
+        message: "Invalid status. Must be 'enabled' or 'disabled'." 
+      });
+    }
+    req.product.status = status;
+    const updatedProduct = await req.product.save()
+
+    res.status(200).json({ 
+      message: `Product status updated to ${status}`, 
+      product: updatedProduct 
+    });
+  }
+  catch(err){
+    res.status(500).json({error:err.message})
+  }
+})
 
 module.exports = router;
