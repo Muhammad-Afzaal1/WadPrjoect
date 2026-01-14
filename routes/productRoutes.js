@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Product = require('../Product');
+const Product = require('../models/Product');
 
 // POST /api/products → Create product listing with images and seller 
 router.post('/', async (req, res) => {

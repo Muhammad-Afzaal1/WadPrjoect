@@ -6,7 +6,7 @@ const LocalStrategy = require('passport-local').Strategy; // Change this import 
 const jwt = require('jsonwebtoken');
 const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
 
-const User = require('./User');
+const User = require('./models/User');
 const productRoutes = require('./routes/productRoutes');
 const authRoutes = require('./routes/authRoutes');
 const port = 3000;
