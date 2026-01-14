@@ -6,6 +6,8 @@ router.get('/', async(req, res)=>{
     res.send('hello, world')
 })
 
+
+
 router.post('/register', async(req, res)=>{
     try{
         const {username, email, password, password2} = req.body;
@@ -23,6 +25,28 @@ router.post('/register', async(req, res)=>{
     }
 })
 
+router.post('/login', async(req, res)=>{
+    try{   
+        const {email, password} = req.body;
+        const user = await User.findOne({email:email})
+        if(!user){
+            res.status(401).json({error:"User with this email doesn't exist"})
+        }
+        if(!user.comparePassword(password)){
+            res.status(401).json({error:"Incorrect password"})
+        }
+        const payload= {
+            id:user._id,
+            email:email,
+            role:user.role
+        }
+        const token = jwt.sign(payload,"123", {expiresIn:"1h"})
+        res.status(201).json({"token":token, user:payload});
+    }
+    catch(err){
+        res.status(500).json({"error":err.message});
+    }
+})
 
 
 module.exports = router
