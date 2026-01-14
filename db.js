@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const url = 'mongodb://localhost:27017/ebay'
+const url = 'mongodb://127.0.0.1:27017/ebay'
 mongoose.connect(url);
 const db = mongoose.connection
 db.on('connected',()=>{console.log('MongoDB is connected')})
