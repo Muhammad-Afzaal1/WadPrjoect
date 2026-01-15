@@ -5,7 +5,17 @@ const authenticateToken = require("../middleware/authenticateToken");
 const isSeller = require('../middleware/isSeller');
 const isProductOwner = require('../middleware/isProductOwner')
 
-// CREATE PRODUCT (PROTECTED)
+
+router.get("/", async (req, res) => {
+  try {
+    
+    const products = await Product.find({ status: "enabled" });
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.post("/", authenticateToken, isSeller, async (req, res) => {
   try {
     const { name, description, price, quantity, category, images } = req.body;
@@ -27,16 +37,7 @@ router.post("/", authenticateToken, isSeller, async (req, res) => {
   }
 });
 
-// Updated Public GET route
-router.get("/", async (req, res) => {
-  try {
-    // Only show products where status is 'enabled'
-    const products = await Product.find({ status: "enabled" });
-    res.json(products);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+
 
 // GET PRODUCT BY ID (PUBLIC)
 router.get("/:id", async (req, res) => {

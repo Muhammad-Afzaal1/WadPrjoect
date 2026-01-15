@@ -7,6 +7,8 @@ const User = require('./models/User');
 const productRoutes = require('./routes/productRoutes');
 const authRoutes = require('./routes/authRoutes');
 const sellerRoutes = require('./routes/sellerRoutes')
+const orderRoutes = require('./routes/orderRoutes');
+const feedbackRoutes = require('./routes/feedbackRoutes');
 const port = 3000;
 const app = express();
 
@@ -15,7 +17,9 @@ app.use(bodyParser.json());
 
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/seller', sellerRoutes)
+app.use('/api/seller', sellerRoutes);
+app.use('/api/order/', orderRoutes)
+app.use('/api/feedback', feedbackRoutes)
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 }); 
