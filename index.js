@@ -11,11 +11,13 @@ const orderRoutes = require('./routes/orderRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const inventoryRoutes = require('./routes/inventoryRoutes')
 const auctionRoutes = require('./routes/auctionRoutes')
+
 const port = 3000;
 const app = express();
 
 app.use(bodyParser.json());
-
+const cors = require('cors');
+app.use(cors());
 
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
