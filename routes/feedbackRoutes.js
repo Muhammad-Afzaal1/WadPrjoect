@@ -1,10 +1,10 @@
 const express = require('express')
 const router = express.Router();
 const FeedBack = require('../models/Feedback');
-const { authenticate } = require('passport');
+const authenticateToken = require('../middleware/authenticateToken')
 const Product = require('../models/Product');
 const Order = require('../models/Order')
-router.post('/',authenticate, async(req, res)=>{
+router.post('/',authenticateToken, async(req, res)=>{
     try{
         const {productId, rating, comment} = req.body;
         const product = await Product.findById(productId);
@@ -21,7 +21,7 @@ router.post('/',authenticate, async(req, res)=>{
             return res.status(403).json({ message: "You can only review products you have purchased." });
         }
 
-        const feedback = new Feedback({
+        const feedback = new FeedBack({
             reviewer: req.user.id, 
             seller: product.seller,
             product: productId,
@@ -33,7 +33,7 @@ router.post('/',authenticate, async(req, res)=>{
         res.status(201).json({ message: "Feedback submitted successfully", feedback });
 
     }catch(err){
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: err.message });
     }
 })
 
