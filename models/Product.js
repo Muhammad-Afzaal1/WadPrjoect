@@ -33,6 +33,17 @@ const productSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    isAuction: {
+        type: Boolean,
+        default: false
+    },
+    auctionEnd: {
+        type: Date
+    },
+    startingBid: {
+        type: Number,
+        default: 0
     }
 });
 

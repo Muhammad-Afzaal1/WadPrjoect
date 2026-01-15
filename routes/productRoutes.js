@@ -8,7 +8,7 @@ const isProductOwner = require('../middleware/isProductOwner')
 
 router.get("/", async (req, res) => {
   try {
-    
+
     const products = await Product.find({ status: "enabled" });
     res.json(products);
   } catch (error) {
@@ -38,6 +38,54 @@ router.post("/", authenticateToken, isSeller, async (req, res) => {
 });
 
 
+
+// SEARCH & FILTER PRODUCTS (PUBLIC)
+router.get("/search", async (req, res) => {
+  try {
+    // 1. Initialize query with base constraint
+    let query = { status: "enabled" };
+
+    // 2. Extract parameters from query string
+    const { q, category, minPrice, maxPrice, seller } = req.query;
+
+    // 3. Add Text Search (Name or Description)
+    if (q) {
+      query.$or = [
+        { name: { $regex: q, $options: "i" } },
+        { description: { $regex: q, $options: "i" } }
+      ];
+    }
+
+    // 4. Add Category Filter
+    if (category) {
+      query.category = category;
+    }
+
+    // 5. Add Seller Filter
+    if (seller) {
+      query.seller = seller;
+    }
+
+    // 6. Add Price Range Filter
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = Number(minPrice);
+      if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    // 7. Execute query and populate seller info
+    const products = await Product.find(query)
+      .populate("seller", "username")
+      .sort({ createdAt: -1 });
+
+    res.json({
+      results: products.length,
+      products
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // GET PRODUCT BY ID (PUBLIC)
 router.get("/:id", async (req, res) => {
@@ -72,7 +120,7 @@ router.put("/:id", authenticateToken, isProductOwner, async (req, res) => {
 });
 
 // DELETE PRODUCT (PROTECTED)
-router.delete("/:id", authenticateToken,isSeller, isProductOwner, async (req, res) => {
+router.delete("/:id", authenticateToken, isSeller, isProductOwner, async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: "Product deleted successfully" });
@@ -81,24 +129,24 @@ router.delete("/:id", authenticateToken,isSeller, isProductOwner, async (req, re
   }
 });
 
-router.patch('/:id/status', authenticateToken,isSeller, isProductOwner,async(req, res)=>{
-  try{
-    const {status} = req.body
-    if(!['enabled', 'disabled'].includes(status)){
-      return res.status(400).json({ 
-        message: "Invalid status. Must be 'enabled' or 'disabled'." 
+router.patch('/:id/status', authenticateToken, isSeller, isProductOwner, async (req, res) => {
+  try {
+    const { status } = req.body
+    if (!['enabled', 'disabled'].includes(status)) {
+      return res.status(400).json({
+        message: "Invalid status. Must be 'enabled' or 'disabled'."
       });
     }
     req.product.status = status;
     const updatedProduct = await req.product.save()
 
-    res.status(200).json({ 
-      message: `Product status updated to ${status}`, 
-      product: updatedProduct 
+    res.status(200).json({
+      message: `Product status updated to ${status}`,
+      product: updatedProduct
     });
   }
-  catch(err){
-    res.status(500).json({error:err.message})
+  catch (err) {
+    res.status(500).json({ error: err.message })
   }
 })
 
